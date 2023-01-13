@@ -2,24 +2,21 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const bodyParser = require('body-parser');
-const formidable = require('express-formidable');
+const morgan = require("morgan");
+const bodyParser = require("body-parser");
+const formidable = require("express-formidable");
 const userRoutes = require("./server/routes/userRoutes");
 const PORT = process.env.PORT || 5010;
 
 const app = express();
 
-
-
-
+app.use(morgan("dev"));
+app.use(cors());
 
 // parse application/json
 app.use(bodyParser.json());
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
-
-
-app.use(cors());
 
 ////////////////////////////////////////
 // Enable form data parsing
@@ -36,6 +33,7 @@ mongoose
     dbName: "E-learning",
     useNewUrlParser: true,
     useUnifiedTopology: true,
+
   })
   .then((result) => {
     console.log(`Connected to Database`);
