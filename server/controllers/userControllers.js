@@ -99,20 +99,26 @@ module.exports.forgetPassword = async (req, res) => {
 
 module.exports.verifyOtp = async (req, res) => {
   const { otp, phone } = req.body;
-  const otpHolder = await Otp.find({
-    phone,
-  });
-  if (otpHolder.length === 0)
-    return res.status(400).json({ message: "Otp is expired!", status: 0 });
-
-  const rightOtpFind = otpHolder[otpHolder.length - 1];
-  const validUser = await bcrypt.compare(otp,rightOtpFind.otp );
-  if (rightOtpFind.phone == phone && validUser) {
-    const OtpDelete = await Otp.deleteMany({
-      phone: phone,
+  try {
+    const otpHolder = await Otp.find({
+      phone,
     });
-    return res.status(200).json({ message: "verified", success: 1 });
-  } else {
-    return res.status(400).json({ message: "Your Otp was wrong", success: 0 });
+    if (otpHolder.length === 0)
+      return res.status(400).json({ message: "Otp is expired!", status: 0 });
+
+    const rightOtpFind = otpHolder[otpHolder.length - 1];
+    const validUser = await bcrypt.compare(otp, rightOtpFind.otp);
+    if (rightOtpFind.phone == phone && validUser) {
+      const OtpDelete = await Otp.deleteMany({
+        phone: phone,
+      });
+      return res.status(200).json({ message: "verified", success: 1 });
+    } else {
+      return res
+        .status(400)
+        .json({ message: "Your Otp was wrong", success: 0 });
+    }
+  } catch (error) {
+    res.status(400).json({ error: error.message, status: 0 });
   }
 };
